@@ -174,7 +174,38 @@ src/server/src/
    DATABASE_URL=postgresql://username:password@localhost:5432/cinema_db
    JWT_SECRET=your_jwt_secret_here
    PORT=3000
+
+ # --- S3 (Movie poster uploads) ---
+ # Used by /manager/movies/posters/presigned-url to generate a browser PUT URL
+ AWS_REGION=your-region
+ S3_BUCKET=your-bucket-name
+ # Optional (defaults to "movie-posters")
+ S3_KEY_PREFIX=movie-posters
+ # Optional: if set, poster URLs will be returned as `${S3_PUBLIC_BASE_URL}/${key}`
+ # Example: https://your-cdn-or-bucket-public-url
+ S3_PUBLIC_BASE_URL=
    ```
+
+### S3 Poster Upload (presigned PUT)
+
+The manager “Add Movie” / “Edit Movie” screens upload the selected poster file **directly from the browser** using a backend-generated **presigned PUT URL**. After upload, the frontend stores the returned `posterUrl` into the `Movie.poster_url` column.
+
+Assumptions:
+- `posterUrl` is a **public URL** suitable for `<img src="...">` without extra signing.
+- The frontend sends `Content-Type` based on the selected file’s MIME type.
+
+S3 CORS example (adjust `AllowedOrigins` for your frontend URL):
+
+```json
+[
+  {
+    "AllowedOrigins": ["http://localhost:5174"],
+    "AllowedMethods": ["PUT"],
+    "AllowedHeaders": ["Content-Type"],
+    "MaxAgeSeconds": 3000
+  }
+]
+```
 
 4. **Set up the database**
 

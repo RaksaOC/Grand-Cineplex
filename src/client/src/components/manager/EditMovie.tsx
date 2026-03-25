@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowLeft, Upload, Play, Film } from "lucide-react";
-import { updateMovie } from "../../api/manager";
+import { getMoviePosterPresignedUrl, updateMovie } from "../../api/manager";
 
 type MovieData = {
 	id: number;
@@ -25,6 +25,20 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 	const [formData, setFormData] = useState<MovieData>({ ...movie });
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [posterFile, setPosterFile] = useState<File | null>(null);
+	const [posterPreviewUrl, setPosterPreviewUrl] = useState<string | null>(
+		null
+	);
+
+	useEffect(() => {
+		if (!posterFile) {
+			setPosterPreviewUrl(null);
+			return;
+		}
+		const objectUrl = URL.createObjectURL(posterFile);
+		setPosterPreviewUrl(objectUrl);
+		return () => URL.revokeObjectURL(objectUrl);
+	}, [posterFile]);
 
 	const handleInputChange = (field: keyof MovieData, value: string) => {
 		setFormData((prev) => ({
@@ -37,22 +51,58 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 		e.preventDefault();
 		setIsSubmitting(true);
 
-		// Check if formData is exactly the same as movie
-		if (JSON.stringify(formData) === JSON.stringify(movie)) {
+		const isTextFieldsUnchanged =
+			JSON.stringify(formData) === JSON.stringify(movie);
+
+		// Guard against no-op updates (including poster file selection)
+		if (isTextFieldsUnchanged && !posterFile) {
 			alert("Please change at least one field to edit the movie.");
 			setIsSubmitting(false);
 			return;
 		}
 
+		let didSucceed = false;
 		try {
-			await updateMovie(formData);
+			let posterUrlToSave = formData.posterUrl;
+
+			if (posterFile) {
+				const presigned = await getMoviePosterPresignedUrl({
+					movieId: formData.id,
+					fileName: posterFile.name,
+					contentType: posterFile.type,
+				});
+
+				const uploadResp = await fetch(presigned.uploadUrl, {
+					method: "PUT",
+					headers: {
+						"Content-Type":
+							posterFile.type || "application/octet-stream",
+					},
+					body: posterFile,
+				});
+
+				if (!uploadResp.ok) {
+					throw new Error(
+						`S3 upload failed: ${uploadResp.status}`
+					);
+				}
+
+				posterUrlToSave = presigned.posterUrl;
+			}
+
+			await updateMovie({
+				...formData,
+				posterUrl: posterUrlToSave,
+			});
+			didSucceed = true;
 		} catch (error) {
-			console.error("Error adding movie:", error);
+			console.error("Error updating movie with poster upload:", error);
+			alert("Failed to update movie. Please try again.");
 		} finally {
 			setIsSubmitting(false);
 		}
 
-		onBack();
+		if (didSucceed) onBack();
 	};
 
 	const genres = [
@@ -170,20 +220,19 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 							<div className="space-y-4">
 								<div>
 									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Poster Image URL
+										Poster Image
 									</label>
 									<div className="relative">
 										<input
-											type="url"
-											value={formData.posterUrl}
-											onChange={(e) =>
-												handleInputChange(
-													"posterUrl",
-													e.target.value
-												)
-											}
-											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-											placeholder="https://example.com/poster.jpg"
+											type="file"
+											accept="image/*"
+											onChange={(e) => {
+												const file =
+													e.target.files?.[0] ||
+													null;
+												setPosterFile(file);
+											}}
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none file:mr-4 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-sm file:bg-gray-800 file:text-white"
 										/>
 										<Upload className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
 									</div>
@@ -211,14 +260,17 @@ export default function EditMovie({ onBack, movie }: EditMovieProps) {
 								</div>
 
 								{/* Poster Preview */}
-								{formData.posterUrl && (
+								{(posterPreviewUrl || formData.posterUrl) && (
 									<div className="mt-4">
 										<label className="block text-sm font-medium text-slate-300 mb-2">
 											Poster Preview
 										</label>
 										<div className="w-32 h-48 bg-gray-900/50 rounded-lg overflow-hidden border border-slate-700">
 											<img
-												src={formData.posterUrl}
+												src={
+													posterPreviewUrl ||
+													formData.posterUrl
+												}
 												alt="Poster preview"
 												className="w-full h-full object-cover"
 												onError={(e) => {

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Movie from "../../../db/models/Movie";
 import Screening from "../../../db/models/Screening";
 import { Op } from "sequelize";
+import { getMoviePosterPresignedUploadUrl } from "../../../services/s3PosterService";
 
 export const getAllMovies = async (req: Request, res: Response) => {
 	try {
@@ -181,5 +182,43 @@ export const getRecentlyAddedMovies = async (req: Request, res: Response) => {
 		res.status(200).json(movies);
 	} catch (error) {
 		res.status(500).json({ message: "Internal server error", error });
+	}
+};
+
+export const getMoviePosterPresignedUrl = async (req: Request, res: Response) => {
+	try {
+		const { movieId, fileName, contentType } = req.body as {
+			movieId?: number;
+			fileName?: string;
+			contentType?: string;
+		};
+
+		const parsedMovieId = typeof movieId === "string" ? parseInt(movieId, 10) : movieId;
+		if (!parsedMovieId || Number.isNaN(parsedMovieId)) {
+			return res.status(400).json({ message: "movieId is required and must be a number" });
+		}
+		if (!fileName || typeof fileName !== "string") {
+			return res.status(400).json({ message: "fileName is required" });
+		}
+
+		// Key scheme includes movieId, so ensure the movie exists.
+		const movie = await Movie.findByPk(parsedMovieId);
+		if (!movie) {
+			return res.status(404).json({ message: "Movie not found" });
+		}
+
+		const { uploadUrl, posterUrl, key } =
+			await getMoviePosterPresignedUploadUrl({
+				movieId: parsedMovieId,
+				fileName,
+				contentType,
+			});
+
+		res.status(200).json({ uploadUrl, posterUrl, key });
+	} catch (error: any) {
+		// Helpful for missing S3 env vars during development.
+		res
+			.status(500)
+			.json({ message: "Failed to generate presigned upload URL", error: error?.message || error });
 	}
 };

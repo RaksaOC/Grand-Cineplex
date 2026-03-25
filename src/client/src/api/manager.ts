@@ -3,19 +3,31 @@ import axios from "axios";
 type MovieData = {
   id?: number; // Optional for new movies
   title: string;
-  description: string;
-  posterUrl: string;
-  trailerUrl: string;
+  description?: string;
+  posterUrl?: string;
+  trailerUrl?: string;
   duration: string;
-  genre: string;
-  rating: number;
-  releaseDate: string;
-  director: string;
-  cast: string;
-  language: string;
+  genre?: string;
+  rating?: number;
+  releaseDate?: string;
+  director?: string;
+  cast?: string;
+  language?: string;
 };
 
-const API_BASE_URL = "http://localhost:6900";
+type MoviePosterPresignedUrlRequest = {
+  movieId: number;
+  fileName: string;
+  contentType?: string;
+};
+
+type MoviePosterPresignedUrlResponse = {
+  uploadUrl: string;
+  posterUrl: string;
+  key: string;
+};
+
+const API_BASE_URL = process.env.API_BASE_URL;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -90,6 +102,24 @@ export const updateMovie = async (movieData: MovieData) => {
     return response.data;
   } catch (error) {
     console.error("Error updating movie:", error);
+    throw error;
+  }
+};
+
+export const getMoviePosterPresignedUrl = async (
+  data: MoviePosterPresignedUrlRequest
+): Promise<MoviePosterPresignedUrlResponse> => {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/manager/movies/posters/presigned-url`,
+      data,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching presigned upload URL:", error);
     throw error;
   }
 };

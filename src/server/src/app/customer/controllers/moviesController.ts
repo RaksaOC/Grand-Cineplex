@@ -36,12 +36,6 @@ export const getNowShowingMovies = async (req: Request, res: Response) => {
     twentyDaysAgo.setDate(today.getDate() - 20);
 
     const movies = await Movie.findAll({
-      where: {
-        releaseDate: {
-          [Op.gte]: twentyDaysAgo,
-          [Op.lte]: today,
-        },
-      },
       order: [["releaseDate", "DESC"]],
     });
 
@@ -72,12 +66,6 @@ export const getMoviesFor7Days = async (req: Request, res: Response) => {
         {
           model: Screening,
           as: "screenings",
-          where: {
-            screeningDate: {
-              [Op.gte]: selectedDate,
-              [Op.lt]: nextDay,
-            },
-          },
           required: true,
         },
       ],
@@ -112,12 +100,6 @@ export const getComingSoonMovies = async (req: Request, res: Response) => {
         {
           model: Screening,
           as: "screenings",
-          where: {
-            screeningDate: {
-              [Op.gte]: startOfMonth,
-              [Op.lt]: startOfNextMonth,
-            },
-          },
           required: true,
         },
       ],

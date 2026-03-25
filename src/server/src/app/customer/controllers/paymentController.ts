@@ -8,7 +8,6 @@ import crypto from "crypto";
 dotenv.config();
 
 const merchantId = process.env.MERCHANT_ID!;
-// const apiUrl = process.env.API_URL!;
 const apiUrl =
   "https://checkout-sandbox.payway.com.kh/api/payment-gateway/v1/payments/generate-qr";
 const secretKey = process.env.PUBLIC_KEY!;

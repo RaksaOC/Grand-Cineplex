@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	ArrowLeft,
 	Upload,
@@ -8,12 +8,11 @@ import {
 	Star,
 	Film,
 } from "lucide-react";
-import { addMovie } from "../../api/manager";
+import { addMovie, getMoviePosterPresignedUrl, updateMovie } from "../../api/manager";
 
 type MovieDatas = {
 	title: string;
 	description: string;
-	posterUrl: string;
 	trailerUrl: string;
 	duration: string;
 	genre: string;
@@ -28,7 +27,6 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 	const [formData, setFormData] = useState<MovieDatas>({
 		title: "",
 		description: "",
-		posterUrl: "",
 		trailerUrl: "",
 		duration: "",
 		genre: "",
@@ -40,6 +38,20 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 	});
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [posterFile, setPosterFile] = useState<File | null>(null);
+	const [posterPreviewUrl, setPosterPreviewUrl] = useState<string | null>(
+		null
+	);
+
+	useEffect(() => {
+		if (!posterFile) {
+			setPosterPreviewUrl(null);
+			return;
+		}
+		const objectUrl = URL.createObjectURL(posterFile);
+		setPosterPreviewUrl(objectUrl);
+		return () => URL.revokeObjectURL(objectUrl);
+	}, [posterFile]);
 
 	const handleInputChange = (field: keyof MovieDatas, value: string) => {
 		setFormData((prev) => ({
@@ -52,22 +64,48 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 		e.preventDefault();
 		setIsSubmitting(true);
 
-		// TODO: Implement API call to add movie
-		// console.log("Adding movie:", formData);
-
-		// // Simulate API call
-		// await new Promise(resolve => setTimeout(resolve, 1000));
-
 		try {
-			await addMovie(formData);
-			// console.log("Adding movie:", formData);
+			if (!posterFile) {
+				alert("Please select a poster image.");
+				return;
+			}
+
+			const createdMovie = await addMovie(formData as any);
+			const movieId: number = createdMovie.id;
+
+			const presigned = await getMoviePosterPresignedUrl({
+				movieId,
+				fileName: posterFile.name,
+				contentType: posterFile.type,
+			});
+
+			// Upload to S3 directly from the browser (PUT to presigned URL)
+			const uploadResp = await fetch(presigned.uploadUrl, {
+				method: "PUT",
+				headers: {
+					"Content-Type":
+						posterFile.type || "application/octet-stream",
+				},
+				body: posterFile,
+			});
+
+			if (!uploadResp.ok) {
+				throw new Error(`S3 upload failed: ${uploadResp.status}`);
+			}
+
+			await updateMovie({
+				...formData,
+				id: movieId,
+				posterUrl: presigned.posterUrl,
+			} as any);
+
+			onBack();
 		} catch (error) {
-			console.error("Error adding movie:", error);
+			console.error("Error adding movie with poster upload:", error);
+			alert("Failed to add movie. Please try again.");
 		} finally {
 			setIsSubmitting(false);
 		}
-
-		onBack();
 	};
 
 	const genres = [
@@ -239,21 +277,20 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 							<div className="space-y-4">
 								<div>
 									<label className="block text-sm font-medium text-slate-300 mb-2">
-										Poster Image URL *
+										Poster Image *
 									</label>
 									<div className="relative">
 										<input
-											type="url"
+											type="file"
+											accept="image/*"
 											required
-											value={formData.posterUrl}
-											onChange={(e) =>
-												handleInputChange(
-													"posterUrl",
-													e.target.value
-												)
-											}
-											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
-											placeholder="https://example.com/poster.jpg"
+											onChange={(e) => {
+												const file =
+													e.target.files?.[0] ||
+													null;
+												setPosterFile(file);
+											}}
+											className="w-full rounded-lg border border-slate-700 bg-gray-900/50 px-4 py-2 text-white focus:border-blue-500 focus:outline-none file:mr-4 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-sm file:bg-gray-800 file:text-white"
 										/>
 										<Upload className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
 									</div>
@@ -281,14 +318,14 @@ export default function AddMovie({ onBack }: { onBack: () => void }) {
 								</div>
 
 								{/* Poster Preview */}
-								{formData.posterUrl && (
+								{posterPreviewUrl && (
 									<div className="mt-4">
 										<label className="block text-sm font-medium text-slate-300 mb-2">
 											Poster Preview
 										</label>
 										<div className="w-32 h-48 bg-gray-900/50 rounded-lg overflow-hidden border border-slate-700">
 											<img
-												src={formData.posterUrl}
+												src={posterPreviewUrl}
 												alt="Poster preview"
 												className="w-full h-full object-cover"
 												onError={(e) => {
