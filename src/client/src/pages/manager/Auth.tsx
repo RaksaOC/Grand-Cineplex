@@ -34,7 +34,8 @@ export default function Auth() {
         setSubmitting(true);
 
         try {
-            const res = await TokenAPI.TokenAPIManager.post("/login", {
+            const api_base_url = import.meta.env.VITE_API_BASE_URL;
+            const res = await TokenAPI.TokenAPIManager.post(`${api_base_url}/manager/users/login`, {
                 email,
                 password,
             });
