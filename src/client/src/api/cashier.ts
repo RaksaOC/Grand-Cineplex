@@ -6,7 +6,7 @@ const getAuthHeaders = () => {
 	return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-const API_BASE_URL = "http://localhost:6900";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 type BookingSummary = {
 	seats: number[];
 	screeningId: number;

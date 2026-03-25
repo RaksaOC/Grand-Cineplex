@@ -6,10 +6,11 @@ import {
   Theater,
 } from "../../../shared/types/type";
 
-const movieBaseUrl = "http://localhost:6900/customer/movies";
-const seatBaseUrl = "http://localhost:6900/customer/seats";
-const bookingUrl = "http://localhost:6900/customer/bookings";
-const theaterBaseUrl = "http://localhost:6900/customer/theaters";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const movieBaseUrl = `${API_BASE_URL}/customer/movies`;
+const seatBaseUrl = `${API_BASE_URL}/customer/seats`;
+const bookingUrl = `${API_BASE_URL}/customer/bookings`;
+const theaterBaseUrl = `${API_BASE_URL}/customer/theaters`;
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
