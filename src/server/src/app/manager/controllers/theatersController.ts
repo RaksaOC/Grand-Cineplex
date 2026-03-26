@@ -118,6 +118,6 @@ export const addTheater = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Error creating theater with seats:", error);
-    return return res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };

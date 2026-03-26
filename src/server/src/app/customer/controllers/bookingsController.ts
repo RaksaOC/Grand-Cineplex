@@ -79,7 +79,7 @@ export const getBookingBasedOnId = async (req: Request, res: Response) => {
     return res.status(200).json(summary);
   } catch (error) {
     console.error("getBookingBasedOnId error:", error);
-    return return res.status(500).json({ message: "Internal server error" });
+    return  res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -142,7 +142,7 @@ export const createBooking = async (req: Request, res: Response) => {
     return res.status(201).json({ id: booking.id, payment });
   } catch (error) {
     console.error("createBooking error:", error);
-    return return res.status(500).json({ message: "Booking failed" });
+    return  res.status(500).json({ message: "Booking failed" });
   }
 };
 
@@ -276,6 +276,6 @@ export const viewBookingHistory = async (req: Request, res: Response) => {
     return res.status(200).json({ bookings: bookingSummary });
   } catch (error) {
     console.error("ViewBookingHistory error:", error);
-    return return res.status(500).json({ message: "Internal server error" });
+    return  res.status(500).json({ message: "Internal server error" });
   }
 };

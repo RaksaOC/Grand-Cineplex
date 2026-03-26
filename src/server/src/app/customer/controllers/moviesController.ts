@@ -185,6 +185,6 @@ export const getMoviesAndItsScreenings = async (
 
     return res.status(200).json(movieWithScreenings);
   } catch (error) {
-    return return res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
