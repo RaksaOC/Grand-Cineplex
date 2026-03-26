@@ -36,7 +36,7 @@ export const getTodayShowTimes = async (req: Request, res: Response) => {
 
     res.status(200).json(showTimeForToday);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -60,7 +60,7 @@ export const getAllShowTimes = async (req: Request, res: Response) => {
     });
     res.status(200).json(allShowTimes);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -85,7 +85,7 @@ export const getShowTimesBasedOnMovieId = async (
     });
     res.status(200).json(showTimesForMovie);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -108,7 +108,7 @@ export const addShowTime = async (req: Request, res: Response) => {
 
     res.status(201).json(newShowTime);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -138,7 +138,7 @@ export const updateShowTime = async (req: Request, res: Response) => {
 
     res.status(200).json(showTime);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -156,11 +156,11 @@ export const deleteShowTime = async (req: Request, res: Response) => {
 
     res.status(200).json({ message: "Show time deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
-export const getShowTimesBasedOnId= async (req: Request, res: Response) => {
+export const getShowTimesBasedOnId = async (req: Request, res: Response) => {
   try {
     const showTimeId = parseInt(req.params.id);
     const showTime = await Screening.findByPk(showTimeId, {
@@ -182,6 +182,6 @@ export const getShowTimesBasedOnId= async (req: Request, res: Response) => {
 
     res.status(200).json(showTime);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 }

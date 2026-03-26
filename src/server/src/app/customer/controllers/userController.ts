@@ -44,7 +44,7 @@ export const signup = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Signup error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -81,7 +81,7 @@ export const login = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Login error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -108,6 +108,6 @@ export const getUserInfo = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("GetUserInfo error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return return res.status(500).json({ message: "Internal server error" });
   }
 };

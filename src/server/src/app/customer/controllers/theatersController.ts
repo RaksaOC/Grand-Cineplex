@@ -8,7 +8,7 @@ export const getAllTheaters = async (req: Request, res: Response) => {
     });
     res.status(200).json(allTheaters);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -27,6 +27,6 @@ export const getTheaterById = async (req: Request, res: Response) => {
 
     res.status(200).json(theater);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };

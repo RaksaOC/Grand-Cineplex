@@ -10,7 +10,7 @@ export const getAllMovies = async (req: Request, res: Response) => {
     });
     res.status(200).json(allMovies);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -25,7 +25,7 @@ export const getMovieBasedOnId = async (req: Request, res: Response) => {
 
     res.status(200).json(movie);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -41,7 +41,7 @@ export const getNowShowingMovies = async (req: Request, res: Response) => {
 
     res.status(200).json(movies);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -75,7 +75,7 @@ export const getMoviesFor7Days = async (req: Request, res: Response) => {
     res.json(movies);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -109,7 +109,7 @@ export const getComingSoonMovies = async (req: Request, res: Response) => {
     res.status(200).json(movies);
   } catch (error) {
     console.error("Error fetching upcoming movies:", error);
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -185,6 +185,6 @@ export const getMoviesAndItsScreenings = async (
 
     return res.status(200).json(movieWithScreenings);
   } catch (error) {
-    return res.status(500).json({ message: "Internal server error", error });
+    return return res.status(500).json({ message: "Internal server error", error });
   }
 };

@@ -89,7 +89,7 @@ export const getAllSeatsBasedOnShowTime = async (
     });
   } catch (error: unknown) {
     const err = error instanceof Error ? error.message : error;
-    res.status(500).json({ error: err });
+    return res.status(500).json({ error: err });
   }
 };
 
@@ -112,7 +112,7 @@ export const addSeat = async (req: Request, res: Response) => {
 
     res.status(201).json(newSeat);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -141,7 +141,7 @@ export const updateSeat = async (req: Request, res: Response) => {
 
     res.status(200).json(seat);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -159,6 +159,6 @@ export const deleteSeat = async (req: Request, res: Response) => {
 
     res.status(200).json({ message: "Seat deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };

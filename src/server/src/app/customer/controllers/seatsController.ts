@@ -88,7 +88,7 @@ export const getAllSeatsBasedOnShowTime = async (
     });
   } catch (error: unknown) {
     const err = error instanceof Error ? error.message : error;
-    res.status(500).json({ error: err });
+    return res.status(500).json({ error: err });
   }
 };
 
@@ -125,7 +125,7 @@ export const selectSeat = async (req: Request, res: Response) => {
     res.status(200).json({ message: "Seats available", selected: seat_ids });
   } catch (error: unknown) {
     const err = error instanceof Error ? error.message : error;
-    res.status(500).json({ error: err });
+    return res.status(500).json({ error: err });
   }
 };
 
@@ -188,6 +188,6 @@ export const bookSeats = async (req: Request, res: Response) => {
   } catch (error: unknown) {
     await t?.rollback();
     const err = error instanceof Error ? error.message : error;
-    res.status(500).json({ error: err });
+    return res.status(500).json({ error: err });
   }
 };

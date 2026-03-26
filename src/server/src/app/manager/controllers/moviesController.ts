@@ -11,7 +11,7 @@ export const getAllMovies = async (req: Request, res: Response) => {
 		});
 		res.status(200).json(allMovies);
 	} catch (error) {
-		res.status(500).json({ message: "Internal server error", error });
+		return res.status(500).json({ message: "Internal server error", error });
 	}
 };
 
@@ -26,7 +26,7 @@ export const getMovieBasedOnId = async (req: Request, res: Response) => {
 
 		res.status(200).json(movie);
 	} catch (error) {
-		res.status(500).json({ message: "Internal server error", error });
+		return res.status(500).json({ message: "Internal server error", error });
 	}
 };
 
@@ -59,7 +59,7 @@ export const getComingSoonMovies = async (req: Request, res: Response) => {
 
 		res.status(200).json(moviesComingInNext6Months);
 	} catch (error) {
-		res.status(500).json({ message: "Internal server error", error });
+		return res.status(500).json({ message: "Internal server error", error });
 	}
 };
 
@@ -73,7 +73,7 @@ export const addMovie = async (req: Request, res: Response) => {
 			genre,
 			posterUrl,
 			trailerUrl,
-      rating
+			rating
 		} = req.body;
 
 		if (!title || !duration) {
@@ -90,19 +90,19 @@ export const addMovie = async (req: Request, res: Response) => {
 			genre,
 			posterUrl,
 			trailerUrl,
-      rating: Number(rating) || 7.5,
+			rating: Number(rating) || 7.5,
 		});
 
 		res.status(201).json(newMovie);
 	} catch (error) {
-		res.status(500).json({ message: "Internal server error", error });
+		return res.status(500).json({ message: "Internal server error", error });
 	}
 };
 
 export const updateMovie = async (req: Request, res: Response) => {
 	try {
 		const {
-      id,
+			id,
 			title,
 			description,
 			releaseDate,
@@ -110,7 +110,7 @@ export const updateMovie = async (req: Request, res: Response) => {
 			genre,
 			posterUrl,
 			trailerUrl,
-      rating
+			rating
 		} = req.body;
 
 		const movie = await Movie.findByPk(id);
@@ -119,20 +119,20 @@ export const updateMovie = async (req: Request, res: Response) => {
 			return res.status(404).json({ message: "Movie not found" });
 		}
 
-    await movie.update({
-      ...(title !== undefined && { title }),
-      ...(description !== undefined && { description }),
-      ...(releaseDate !== undefined && { releaseDate }),
-      ...(duration !== undefined && { duration: Number(duration) }),
-      ...(genre !== undefined && { genre }),
-      ...(posterUrl !== undefined && { posterUrl }),
-      ...(trailerUrl !== undefined && { trailerUrl }),
-      ...(rating !== undefined && { rating }),
-    });
+		await movie.update({
+			...(title !== undefined && { title }),
+			...(description !== undefined && { description }),
+			...(releaseDate !== undefined && { releaseDate }),
+			...(duration !== undefined && { duration: Number(duration) }),
+			...(genre !== undefined && { genre }),
+			...(posterUrl !== undefined && { posterUrl }),
+			...(trailerUrl !== undefined && { trailerUrl }),
+			...(rating !== undefined && { rating }),
+		});
 
 		res.status(200).json(movie);
 	} catch (error) {
-		res.status(500).json({ message: "Internal server error", error });
+		return res.status(500).json({ message: "Internal server error", error });
 	}
 };
 
@@ -149,7 +149,7 @@ export const deleteMovie = async (req: Request, res: Response) => {
 
 		res.status(200).json({ message: "Movie deleted successfully" });
 	} catch (error) {
-		res.status(500).json({ message: "Internal server error", error });
+		return res.status(500).json({ message: "Internal server error", error });
 	}
 };
 
@@ -181,7 +181,7 @@ export const getRecentlyAddedMovies = async (req: Request, res: Response) => {
 		const movies = await recentlyAddedMovies();
 		res.status(200).json(movies);
 	} catch (error) {
-		res.status(500).json({ message: "Internal server error", error });
+		return res.status(500).json({ message: "Internal server error", error });
 	}
 };
 

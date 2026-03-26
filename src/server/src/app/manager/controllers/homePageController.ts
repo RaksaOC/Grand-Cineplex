@@ -222,6 +222,6 @@ export const getInfoForHomePage = async (req: any, res: any) => {
 			recentlyAddedMovies: await recentlyAddedMovies(),
 		});
 	} catch (error) {
-		res.status(500).json({ message: "Internal server error", error });
+		return res.status(500).json({ message: "Internal server error", error });
 	}
 };

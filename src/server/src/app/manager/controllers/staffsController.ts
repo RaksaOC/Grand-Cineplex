@@ -24,7 +24,7 @@ export const addStaff = async (req: Request, res: Response) => {
 		res.status(201).json(newStaff);
 	} catch (error) {
 		console.error("Error adding staff:", error);
-		res.status(500).json({ error: "Internal server error" });
+		return res.status(500).json({ error: "Internal server error" });
 	}
 };
 
@@ -40,7 +40,7 @@ export const getStaffInfo = async (req: Request, res: Response) => {
 		res.status(200).json(staffInfo);
 	} catch (error) {
 		console.error("Error fetching staff info:", error);
-		res.status(500).json({ error: "Internal server error" });
+		return res.status(500).json({ error: "Internal server error" });
 	}
 };
 
@@ -77,7 +77,7 @@ export const updateStaffInfo = async (req: Request, res: Response) => {
 		res.status(200).json(updatedStaff);
 	} catch (error) {
 		console.error("Error updating staff info:", error);
-		res.status(500).json({ error: "Internal server error" });
+		return res.status(500).json({ error: "Internal server error" });
 	}
 };
 
@@ -95,7 +95,7 @@ export const deleteStaff = async (req: Request, res: Response) => {
 		res.status(200).json({ message: "Staff deleted successfully" });
 	} catch (error) {
 		console.error("Error deleting staff:", error);
-		res.status(500).json({ error: "Internal server error" });
+		return res.status(500).json({ error: "Internal server error" });
 	}
 };
 
@@ -118,6 +118,6 @@ export const getAllStaff = async (req: Request, res: Response) => {
 		res.status(200).json(dataToSend);
 	} catch (error) {
 		console.error("Error fetching staff list:", error);
-		res.status(500).json({ error: "Internal server error" });
+		return res.status(500).json({ error: "Internal server error" });
 	}
 };

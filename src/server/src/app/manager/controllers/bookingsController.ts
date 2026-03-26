@@ -23,7 +23,7 @@ export const getAllBookingsForUser = async (req: Request, res: Response) => {
     const bookingsInfo = await Booking.findByCustomer(userId);
     res.status(200).json(bookingsInfo);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -48,7 +48,7 @@ export const getBookingBasedOnId = async (req: Request, res: Response) => {
 
     res.status(200).json(bookingInfo);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -77,7 +77,7 @@ export const addBookingByStaff = async (req: Request, res: Response) => {
 
     res.status(201).json(newBooking);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -111,7 +111,7 @@ export const updateBookingByStaff = async (req: Request, res: Response) => {
 
     res.status(200).json(booking);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -129,7 +129,7 @@ export const deleteBookingByStaff = async (req: Request, res: Response) => {
 
     res.status(200).json({ message: "Booking deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -218,6 +218,6 @@ export const getAllBookings = async (req: Request, res: Response) => {
     });
     res.status(200).json(formattedBookings);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };

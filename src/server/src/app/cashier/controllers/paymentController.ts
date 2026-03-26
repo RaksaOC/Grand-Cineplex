@@ -193,7 +193,7 @@ export async function createKhqrPayment(req: Request, res: Response) {
       data: err.config?.data,
     });
 
-    return res.status(500).json({
+    return return res.status(500).json({
       error: "Failed to generate QR code",
       message: err.response?.data || err.message,
       debug: {
@@ -269,7 +269,7 @@ export async function checkPaymentStatus(req: Request, res: Response) {
     console.log("Error Data:", err.response?.data);
     console.log("Error Message:", err.message);
 
-    return res.status(500).json({
+    return return res.status(500).json({
       error: "Failed to check payment status",
       message: err.response?.data || err.message,
       debug: {

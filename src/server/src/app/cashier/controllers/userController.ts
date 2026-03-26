@@ -28,7 +28,7 @@ export const getUserInfo = async (req: Request, res: Response) => {
 
     res.status(200).json(userInfo);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -74,6 +74,6 @@ export const logInUser = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Login error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return return res.status(500).json({ message: "Internal server error" });
   }
 };

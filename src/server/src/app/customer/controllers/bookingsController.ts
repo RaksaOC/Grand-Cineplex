@@ -79,7 +79,7 @@ export const getBookingBasedOnId = async (req: Request, res: Response) => {
     return res.status(200).json(summary);
   } catch (error) {
     console.error("getBookingBasedOnId error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -142,7 +142,7 @@ export const createBooking = async (req: Request, res: Response) => {
     return res.status(201).json({ id: booking.id, payment });
   } catch (error) {
     console.error("createBooking error:", error);
-    return res.status(500).json({ message: "Booking failed" });
+    return return res.status(500).json({ message: "Booking failed" });
   }
 };
 
@@ -244,18 +244,8 @@ export const viewBookingHistory = async (req: Request, res: Response) => {
         date:
           booking.screening?.screeningDate && booking.screening?.screeningTime
             ? new Date(
-                `${booking.screening.screeningDate} ${booking.screening.screeningTime}`
-              ).toLocaleString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true,
-              })
-            : "",
-        time: booking.createdAt
-          ? new Date(booking.createdAt).toLocaleString("en-US", {
+              `${booking.screening.screeningDate} ${booking.screening.screeningTime}`
+            ).toLocaleString("en-US", {
               year: "numeric",
               month: "short",
               day: "numeric",
@@ -263,6 +253,16 @@ export const viewBookingHistory = async (req: Request, res: Response) => {
               minute: "2-digit",
               hour12: true,
             })
+            : "",
+        time: booking.createdAt
+          ? new Date(booking.createdAt).toLocaleString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
           : "",
         seats,
         totalAmount,
@@ -276,6 +276,6 @@ export const viewBookingHistory = async (req: Request, res: Response) => {
     return res.status(200).json({ bookings: bookingSummary });
   } catch (error) {
     console.error("ViewBookingHistory error:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return return res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -19,7 +19,7 @@ export const addTicket = async (req: Request, res: Response) => {
 
     res.status(201).json(newTicket);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -51,7 +51,7 @@ export const getAllTickets = async (req: Request, res: Response) => {
 
     res.status(200).json(allTickets);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -69,7 +69,7 @@ export const deleteTicket = async (req: Request, res: Response) => {
 
     res.status(200).json({ message: "Ticket deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -98,7 +98,7 @@ export const updateTicket = async (req: Request, res: Response) => {
 
     res.status(200).json(ticket);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
 
@@ -116,6 +116,6 @@ export const getTicketBasedOnId = async (req: Request, res: Response) => {
 
     res.status(200).json(ticketsForBooking);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error", error });
+    return res.status(500).json({ message: "Internal server error", error });
   }
 };
