@@ -9,7 +9,7 @@ const sequelize = new Sequelize(process.env.DATABASE_URL!, {
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false 
+      rejectUnauthorized: false
     }
   },
   define: {
@@ -99,7 +99,7 @@ const initializeDatabase = async () => {
 
     setupAssociations();
 
-    await sequelize.sync({ alter: true });
+    await sequelize.authenticate();
   } catch (error) {
     console.error("Unable to connect to the database:", error);
   }
