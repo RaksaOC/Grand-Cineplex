@@ -240,6 +240,38 @@ The application will be available at:
 
 ---
 
+## ☁️ Terraform Deployment (AWS)
+
+This project includes infrastructure-as-code under `terraform/` for deploying:
+- VPC, subnets, internet gateway, route table
+- PostgreSQL RDS database
+- EC2 launch template + Auto Scaling Group
+- Application Load Balancer (ALB)
+- S3 buckets (frontend static hosting + media uploads)
+- CloudWatch CPU alarm
+
+Quick flow:
+1. Set Terraform variables (`db_username`, `db_password`, optional `aws_region`)
+2. Run `terraform init`, `terraform plan`, `terraform apply`
+3. Capture outputs:
+   - `alb_dns_name`
+   - `db_endpoint`
+   - `s3_website_endpoint`
+4. Seed database using SQL scripts in `src/server/src/data/` and `src/shared/data/`
+5. Configure frontend env:
+   - `VITE_API_BASE_URL=http://<alb_dns_name>`
+6. Build frontend and upload static assets to the frontend S3 bucket
+
+Important:
+- RDS is private (`publicly_accessible = false`), so seeding should be done from inside the VPC (or temporary controlled access).
+- Terraform provisions infrastructure; application runtime/deployment validation steps are still required after `apply`.
+
+Detailed infrastructure documentation:
+- See `TERRAFORM.md` for complete resource mapping, deployment workflow, outputs, and operations guidance.
+- See `REPORT.md` for full project and cloud architecture report.
+
+---
+
 ## 📚 API Documentation
 
 ### Base URLs

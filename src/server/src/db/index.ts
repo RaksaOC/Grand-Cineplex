@@ -6,6 +6,12 @@ dotenv.config();
 const sequelize = new Sequelize(process.env.DATABASE_URL!, {
   dialect: "postgres",
   logging: false,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false 
+    }
+  },
   define: {
     freezeTableName: true,
     timestamps: true,
@@ -93,10 +99,7 @@ const initializeDatabase = async () => {
 
     setupAssociations();
 
-    if (process.env.NODE_ENV === "development") {
-      await sequelize.sync({ alter: true });
-      console.log("Database synchronized.");
-    }
+    await sequelize.sync({ alter: true });
   } catch (error) {
     console.error("Unable to connect to the database:", error);
   }

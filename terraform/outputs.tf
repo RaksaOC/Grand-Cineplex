@@ -5,7 +5,7 @@ output "db_endpoint" {
 
 output "alb_dns_name" {
   description = "The DNS name of the load balancer"
-  value       = aws_lb.cineplex_alb.dns_name
+  value       = aws_lb.grand_cineplex_alb.dns_name
 }
 
 output "s3_website_endpoint" {

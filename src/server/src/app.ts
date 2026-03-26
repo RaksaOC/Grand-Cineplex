@@ -7,7 +7,7 @@ import managerRoute from "./app/manager/routes/index";
 const app = express();
 app.use(
   cors({
-    origin: ["http://localhost:5173", ""], // Adjust this to your frontend URL
+    origin: "*", // Adjust this to your frontend URL
     methods: ["GET", "POST", "PATCH", "DELETE"],
     credentials: true, // Allow cookies to be sent with requests
   })

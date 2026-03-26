@@ -25,3 +25,8 @@ dist-ssr
 *.pem
 .env
 cursor/
+
+terraform/.tfvars
+*.terraform.lock.hcl
+terraform/.terraform.lock.hcl
+terraform/.terraform
