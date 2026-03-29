@@ -6,7 +6,7 @@ resource "aws_vpc" "grand_cineplex_vpc" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
   enable_dns_support   = true
-  tags = { Name = "grand_cineplex-vpc" }
+  tags                 = { Name = "grand_cineplex-vpc" }
 }
 
 resource "aws_internet_gateway" "grand_cineplex_igw" {
@@ -19,21 +19,21 @@ resource "aws_subnet" "public_subnet" {
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
   availability_zone       = "${var.aws_region}a"
-  tags                   = { Name = "grand_cineplex-public-subnet" }
+  tags                    = { Name = "grand_cineplex-public-subnet" }
 }
 
 resource "aws_subnet" "private_subnet_1" {
   vpc_id            = aws_vpc.grand_cineplex_vpc.id
   cidr_block        = "10.0.2.0/24"
   availability_zone = "${var.aws_region}a"
-  tags             = { Name = "grand_cineplex-private-subnet-1" }
+  tags              = { Name = "grand_cineplex-private-subnet-1" }
 }
 
 resource "aws_subnet" "private_subnet_2" {
   vpc_id            = aws_vpc.grand_cineplex_vpc.id
   cidr_block        = "10.0.3.0/24"
   availability_zone = "${var.aws_region}b"
-  tags             = { Name = "grand_cineplex-private-subnet-2" }
+  tags              = { Name = "grand_cineplex-private-subnet-2" }
 }
 
 resource "aws_route_table" "public_rt" {
@@ -49,6 +49,37 @@ resource "aws_route_table_association" "public_rt_assoc" {
   route_table_id = aws_route_table.public_rt.id
 }
 
+# EC2 / ALB security group must exist before RDS SG so RDS can allow Postgres only from app instances.
+resource "aws_security_group" "ec2_sg" {
+  name   = "grand-cineplex-ec2-sg"
+  vpc_id = aws_vpc.grand_cineplex_vpc.id
+
+  ingress {
+    description = "HTTP from internet (ALB and direct)"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "SSH (restrict to your IP in production)"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "grand-cineplex-ec2-sg" }
+}
+
 ################################################################################
 #                            2. DATABASE LAYER                                 #
 ################################################################################
@@ -56,12 +87,23 @@ resource "aws_route_table_association" "public_rt_assoc" {
 resource "aws_security_group" "rds_sg" {
   name   = "grand_cineplex-rds-sg"
   vpc_id = aws_vpc.grand_cineplex_vpc.id
+
   ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = [aws_vpc.grand_cineplex_vpc.cidr_block] 
+    description     = "PostgreSQL from EC2 application instances only"
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ec2_sg.id]
   }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "grand-cineplex-rds-sg" }
 }
 
 resource "aws_db_subnet_group" "rds_subnet_group" {
@@ -92,8 +134,8 @@ resource "aws_iam_role" "ec2_s3_role" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
       Principal = { Service = "ec2.amazonaws.com" }
     }]
   })
@@ -114,36 +156,10 @@ resource "aws_iam_instance_profile" "ec2_profile" {
   role = aws_iam_role.ec2_s3_role.name
 }
 
-resource "aws_security_group" "ec2_sg" {
-  name   = "grand-cineplex-ec2-sg"
-  vpc_id = aws_vpc.grand_cineplex_vpc.id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] 
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_launch_template" "grand_cineplex_lt" {
   name_prefix   = "grand-cineplex-lt-"
-  image_id      = "ami-060e277c0d4cce553" 
-  key_name = "grand-cineplex-kp"
+  image_id      = "ami-060e277c0d4cce553"
+  key_name      = "grand-cineplex-kp"
   instance_type = "t3.micro"
 
   iam_instance_profile { name = aws_iam_instance_profile.ec2_profile.name }
@@ -165,7 +181,7 @@ resource "aws_launch_template" "grand_cineplex_lt" {
               
               # DYNAMIC ENV INJECTION
               echo "PORT=80" > .env
-              echo "DATABASE_URL=postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.grand_cineplex_db.endpoint}/grand_cineplex_db" >> .env
+              echo "DATABASE_URL=postgresql://${var.db_username}:${urlencode(var.db_password)}@${aws_db_instance.grand_cineplex_db.endpoint}/grand_cineplex_db" >> .env
               echo "S3_BUCKET=${aws_s3_bucket.media_bucket.id}" >> .env
               echo "AWS_REGION=${var.aws_region}" >> .env
 
@@ -186,6 +202,8 @@ resource "aws_autoscaling_group" "grand_cineplex_asg" {
     id      = aws_launch_template.grand_cineplex_lt.id
     version = "$Latest"
   }
+
+  depends_on = [aws_db_instance.grand_cineplex_db]
 }
 
 ################################################################################
@@ -242,7 +260,7 @@ resource "aws_s3_bucket_website_configuration" "frontend_web" {
 }
 
 resource "aws_s3_bucket_public_access_block" "public_access" {
-  bucket = aws_s3_bucket.frontend_bucket.id
+  bucket                  = aws_s3_bucket.frontend_bucket.id
   block_public_acls       = false
   block_public_policy     = false
   ignore_public_acls      = false
@@ -250,7 +268,7 @@ resource "aws_s3_bucket_public_access_block" "public_access" {
 }
 
 resource "aws_s3_bucket_policy" "public_read_policy" {
-  bucket = aws_s3_bucket.frontend_bucket.id
+  bucket     = aws_s3_bucket.frontend_bucket.id
   depends_on = [aws_s3_bucket_public_access_block.public_access]
   policy = jsonencode({
     Version = "2012-10-17"
@@ -269,13 +287,49 @@ resource "aws_s3_bucket" "media_bucket" {
   bucket = "grand-cineplex-media" # REPLACE XYZ WITH UNIQUE ID
 }
 
-# Media bucket stays private; EC2 uses IAM role to access it
+# Allow a bucket policy for public GET on poster prefix; block ACL-based public access
 resource "aws_s3_bucket_public_access_block" "media_access" {
   bucket = aws_s3_bucket.media_bucket.id
+
   block_public_acls       = true
-  block_public_policy     = true
+  block_public_policy     = false
   ignore_public_acls      = true
-  restrict_public_buckets = true
+  restrict_public_buckets = false
+}
+
+# Browser uploads via presigned PUT; tighten allowed_origins in production
+resource "aws_s3_bucket_cors_configuration" "media_cors" {
+  bucket = aws_s3_bucket.media_bucket.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "PUT", "HEAD"]
+    allowed_origins = var.cors_allowed_origins
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+
+  depends_on = [aws_s3_bucket_public_access_block.media_access]
+}
+
+# Public read for uploaded poster objects only (prefix matches s3PosterService key layout)
+resource "aws_s3_bucket_policy" "media_posters_public_read" {
+  bucket = aws_s3_bucket.media_bucket.id
+
+  depends_on = [aws_s3_bucket_public_access_block.media_access]
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "PublicReadMoviePosters"
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "s3:GetObject"
+        Resource  = "${aws_s3_bucket.media_bucket.arn}/movie-posters/*"
+      }
+    ]
+  })
 }
 
 ################################################################################

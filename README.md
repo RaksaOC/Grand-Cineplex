@@ -251,20 +251,21 @@ This project includes infrastructure-as-code under `terraform/` for deploying:
 - CloudWatch CPU alarm
 
 Quick flow:
-1. Set Terraform variables (`db_username`, `db_password`, optional `aws_region`)
+1. Set Terraform variables (`db_username`, `db_password`, optional `aws_region`, optional `cors_allowed_origins` for S3 media CORS)
 2. Run `terraform init`, `terraform plan`, `terraform apply`
 3. Capture outputs:
    - `alb_dns_name`
    - `db_endpoint`
    - `s3_website_endpoint`
-4. Seed database using SQL scripts in `src/server/src/data/` and `src/shared/data/`
+4. **Manual step — database:** Terraform does not load schema or seed data. Use the **`db_endpoint`** output to build a PostgreSQL URL and run your DDL/DML (e.g. from an EC2 instance in the VPC via SSH, since RDS is private). This is the only required post-apply data step.
 5. Configure frontend env:
    - `VITE_API_BASE_URL=http://<alb_dns_name>`
 6. Build frontend and upload static assets to the frontend S3 bucket
 
 Important:
-- RDS is private (`publicly_accessible = false`), so seeding should be done from inside the VPC (or temporary controlled access).
-- Terraform provisions infrastructure; application runtime/deployment validation steps are still required after `apply`.
+- RDS accepts connections **only from the EC2 security group** (application tier). EC2 instances receive the correct `DATABASE_URL` via launch template user data.
+- Media bucket **CORS** and a **public read policy** for `movie-posters/*` are defined in Terraform so browser PUT (presigned) and `<img>` GET work without using the AWS Console.
+- Terraform provisions infrastructure; schema/seed and frontend upload remain operator steps after `apply`.
 
 Detailed infrastructure documentation:
 - See `TERRAFORM.md` for complete resource mapping, deployment workflow, outputs, and operations guidance.

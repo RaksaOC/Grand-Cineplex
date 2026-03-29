@@ -52,6 +52,7 @@ Key inputs:
 - `aws_region` (default `ap-southeast-1`)
 - `db_username` (sensitive)
 - `db_password` (sensitive)
+- `cors_allowed_origins` (list of strings, default `["*"]`) — S3 **media** bucket CORS `AllowedOrigin` values for browser PUT (presigned uploads) and GET (poster images). Restrict to your frontend website URL(s) in production.
 
 ---
 
@@ -75,13 +76,15 @@ Intent:
 ### 3.3 Database Layer
 
 Resources:
-- `aws_security_group.rds_sg` (Postgres `5432` allowed from VPC CIDR)
+- `aws_security_group.rds_sg` — PostgreSQL **5432** allowed **only** from `aws_security_group.ec2_sg` (application instances), not from the open VPC CIDR. This ensures RDS accepts connections from the Auto Scaling Group while avoiding overly broad ingress.
 - `aws_db_subnet_group.rds_subnet_group` (private subnets)
 - `aws_db_instance.grand_cineplex_db` (PostgreSQL, `db.t3.micro`, private)
 
 Notes:
 - Database is not publicly accessible.
-- Access typically occurs from EC2 or other VPC resources.
+- EC2 instances in `ec2_sg` can connect; operators seeding from a laptop must use **Session Manager**, a **bastion**, or run `psql` **on an existing EC2 instance** in the VPC.
+
+**Dependency:** `aws_security_group.ec2_sg` is declared **before** `rds_sg` so the RDS rule can reference the EC2 security group ID.
 
 ---
 
@@ -94,25 +97,25 @@ Resources:
 - Attachments:
   - `AmazonS3FullAccess`
   - `CloudWatchAgentServerPolicy`
-- `aws_security_group.ec2_sg` (HTTP `80`, SSH `22`, all egress)
-- `aws_launch_template.cineplex_lt`
-- `aws_autoscaling_group.cineplex_asg`
+- `aws_security_group.ec2_sg` (HTTP `80`, SSH `22`, all egress) — defined **before** the RDS layer so RDS can reference it
+- `aws_launch_template.grand_cineplex_lt`
+- `aws_autoscaling_group.grand_cineplex_asg` (`depends_on` the RDS instance so the database exists before instances bootstrap)
 
 Launch template user-data performs:
-1. install Node.js + Git
-2. clone application repository
-3. create backend `.env`
-4. install dependencies and run app with PM2
+1. Install Node.js + Git
+2. Clone application repository
+3. Create backend `.env` (`PORT`, `DATABASE_URL` with **URL-encoded** password, `S3_BUCKET`, `AWS_REGION`)
+4. `npm install` and run the app with PM2
 
 ---
 
 ### 3.5 Load Balancing Layer
 
 Resources:
-- `aws_lb.cineplex_alb` (internet-facing ALB)
-- `aws_lb_target_group.cineplex_tg`
-- `aws_lb_listener.cineplex_listener` (HTTP 80 forward to target group)
-- `aws_autoscaling_attachment.asg_attachment`
+- `aws_lb.grand_cineplex_alb` (internet-facing ALB)
+- `aws_lb_target_group.grand_cineplex_tg`
+- `aws_lb_listener.grand_cineplex_listener` (HTTP 80 forward to target group)
+- `aws_autoscaling_attachment.grand_cineplex_asg_attachment`
 
 Health check:
 - target group checks `path = "/health"`
@@ -125,21 +128,23 @@ Resources:
 - Frontend static hosting bucket:
   - `aws_s3_bucket.frontend_bucket`
   - `aws_s3_bucket_website_configuration.frontend_web`
-  - public access block and bucket policy for public reads
-- Media bucket:
+  - public access block and bucket policy for public reads (`GetObject` on `/*`)
+- Media bucket (posters / presigned uploads):
   - `aws_s3_bucket.media_bucket`
-  - `aws_s3_bucket_public_access_block.media_access` (private)
+  - `aws_s3_bucket_public_access_block.media_access` — blocks **ACL-based** public access but **allows** a bucket policy for public reads on a prefix
+  - `aws_s3_bucket_cors_configuration.media_cors` — allows **GET**, **PUT**, **HEAD** from `var.cors_allowed_origins` (default `*`) so browsers can upload via presigned PUT and load images
+  - `aws_s3_bucket_policy.media_posters_public_read` — **public `GetObject`** only on `movie-posters/*` (matches backend key prefix), so `posterUrl` values work in `<img>` without making the whole bucket public
 
 Intent:
-- Frontend build artifacts served from S3 website endpoint.
-- Application media uploaded to media bucket.
+- Frontend build artifacts served from the S3 website endpoint.
+- Poster files upload with presigned URLs; objects under `movie-posters/` are readable anonymously via HTTPS object URL.
 
 ---
 
 ### 3.7 Monitoring Layer
 
 Resource:
-- `aws_cloudwatch_metric_alarm.high_cpu_alarm`
+- `aws_cloudwatch_metric_alarm.grand_cineplex_high_cpu_alarm`
 
 Tracks:
 - EC2 AutoScalingGroup CPU utilization threshold (`>70`)
@@ -189,17 +194,20 @@ terraform output s3_website_endpoint
   - set `VITE_API_BASE_URL=http://<alb_dns_name>`
   - rebuild frontend
 
-## 5.4 Database Initialization and Seeding
+## 5.4 Database Initialization and Seeding (manual)
 
-Common sequence:
-1. Create schema using `src/server/src/data/DDL.sql` (if tables are absent)
-2. Seed baseline data with one of:
-   - `src/shared/data/fresh_DML.sql`
-   - `src/shared/data/DataInsertion.sql`
+Terraform **does not** apply schema or seed data. After `apply`, use **`terraform output db_endpoint`** (or `rds_endpoint`) with your master username and password to connect to database `grand_cineplex_db`.
 
-Because RDS is private, run seeding from:
-- an instance inside the VPC, or
-- temporary controlled network access
+**Typical operator flow:**
+1. SSH to an EC2 instance in the ASG (same VPC/security context as the app), or use AWS Session Manager / a bastion.
+2. Install `postgresql-client` if needed; run `psql` or restore a dump against the RDS endpoint from the output.
+3. Alternatively, copy SQL files to the instance and execute them.
+
+Project SQL references (paths may vary by branch):
+- Schema: `src/server/src/data/DDL.sql` (or your Sequelize migration workflow)
+- Sample data: `src/shared/data/fresh_DML.sql`, `DataInsertion.sql`, etc.
+
+Until this step is done, the API will fail at runtime when it touches the database.
 
 ## 5.5 Frontend Static Deployment to S3
 
@@ -213,12 +221,12 @@ Because RDS is private, run seeding from:
 
 - `terraform apply` completed without drift/errors
 - ALB health checks are green
-- backend reachable via ALB DNS
-- database reachable from backend runtime
-- schema initialized and seed loaded
-- frontend uses `VITE_API_BASE_URL` pointing to ALB
-- frontend files uploaded to S3 and publicly accessible
-- media uploads from app path are functional
+- Backend reachable via ALB DNS
+- **Schema and seed applied manually** using connection info from `db_endpoint` (from EC2 in VPC or bastion)
+- Database reachable from backend runtime (same EC2 SG as allowed on RDS)
+- Frontend uses `VITE_API_BASE_URL` pointing to ALB
+- Frontend files uploaded to S3 and publicly accessible
+- Media bucket CORS + `movie-posters/*` read policy applied by Terraform; manager poster upload flow works end-to-end
 
 ---
 
