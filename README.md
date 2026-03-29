@@ -251,7 +251,7 @@ This project includes infrastructure-as-code under `terraform/` for deploying:
 - CloudWatch CPU alarm
 
 Quick flow:
-1. Set Terraform variables (`db_username`, `db_password`, optional `aws_region`, optional `cors_allowed_origins` for S3 media CORS)
+1. Set Terraform variables (`db_username`, `db_password`, `jwt_secret`, optional `aws_region`, optional `cors_allowed_origins` for S3 media CORS)
 2. Run `terraform init`, `terraform plan`, `terraform apply`
 3. Capture outputs:
    - `alb_dns_name`
@@ -264,6 +264,7 @@ Quick flow:
 
 Important:
 - RDS accepts connections **only from the EC2 security group** (application tier). EC2 instances receive the correct `DATABASE_URL` via launch template user data.
+- **`jwt_secret`** is passed at `terraform apply` time and written into each instance’s backend `.env` (not the default in source code). Changing it requires a **new launch template version** and replacing ASG instances to pick up the new value.
 - Media bucket **CORS** and a **public read policy** for `movie-posters/*` are defined in Terraform so browser PUT (presigned) and `<img>` GET work without using the AWS Console.
 - Terraform provisions infrastructure; schema/seed and frontend upload remain operator steps after `apply`.
 

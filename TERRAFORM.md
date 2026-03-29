@@ -52,6 +52,7 @@ Key inputs:
 - `aws_region` (default `ap-southeast-1`)
 - `db_username` (sensitive)
 - `db_password` (sensitive)
+- `jwt_secret` (sensitive) — written to the backend `.env` on EC2 (via launch template user-data) so JWT signing matches across instances; use a long random string.
 - `cors_allowed_origins` (list of strings, default `["*"]`) — S3 **media** bucket CORS `AllowedOrigin` values for browser PUT (presigned uploads) and GET (poster images). Restrict to your frontend website URL(s) in production.
 
 ---
@@ -104,7 +105,7 @@ Resources:
 Launch template user-data performs:
 1. Install Node.js + Git
 2. Clone application repository
-3. Create backend `.env` (`PORT`, `DATABASE_URL` with **URL-encoded** password, `S3_BUCKET`, `AWS_REGION`)
+3. Create backend `.env` (`PORT`, `DATABASE_URL` with **URL-encoded** password, `S3_BUCKET`, `AWS_REGION`, `JWT_SECRET` from `var.jwt_secret`)
 4. `npm install` and run the app with PM2
 
 ---
@@ -173,8 +174,8 @@ Practical usage:
 ```bash
 cd terraform
 terraform init
-terraform plan -var="db_username=<db_user>" -var="db_password=<db_pass>"
-terraform apply -var="db_username=<db_user>" -var="db_password=<db_pass>"
+terraform plan -var="db_username=<db_user>" -var="db_password=<db_pass>" -var="jwt_secret=<long_random_secret>"
+terraform apply -var="db_username=<db_user>" -var="db_password=<db_pass>" -var="jwt_secret=<long_random_secret>"
 ```
 
 ## 5.2 Read Outputs
