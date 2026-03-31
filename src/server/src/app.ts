@@ -17,9 +17,9 @@ app.options("*", cors());
 // Middleware
 app.use(express.json());
 
-app.get("/health", async (req, res) => {
-  return res.json(200).json({ "status": "ok" });
-})
+app.get("/health", (req, res) => {
+  return res.status(200).json({ status: "ok" });
+});
 
 app.use("/customer", customerRoute);
 app.use("/cashier", cashierRoute);

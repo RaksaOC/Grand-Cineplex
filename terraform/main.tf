@@ -177,15 +177,16 @@ resource "aws_launch_template" "grand_cineplex_lt" {
 
               # Setup App
               git clone https://github.com/RaksaOC/Grand-Cineplex.git /home/ubuntu/app
+              sudo chown -R ubuntu:ubuntu /home/ubuntu/app
               cd /home/ubuntu/app/src/server
               
               # DYNAMIC ENV INJECTION (JWT via base64 decode — safe for $, quotes, etc.)
-              echo "PORT=80" > .env
+              echo "PORT=3000" > .env
               echo "DATABASE_URL=postgresql://${var.db_username}:${urlencode(var.db_password)}@${aws_db_instance.grand_cineplex_db.endpoint}/grand_cineplex_db2" >> .env
               echo "S3_BUCKET=${aws_s3_bucket.media_bucket.id}" >> .env
               echo "AWS_REGION=${var.aws_region}" >> .env
               echo "JWT_SECRET=$(echo '${base64encode(var.jwt_secret)}' | base64 -d)" >> .env
-
+              
               npm install
               sudo npm install -g pm2
               pm2 start server.ts
