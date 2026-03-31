@@ -181,7 +181,7 @@ resource "aws_launch_template" "grand_cineplex_lt" {
               
               # DYNAMIC ENV INJECTION (JWT via base64 decode — safe for $, quotes, etc.)
               echo "PORT=80" > .env
-              echo "DATABASE_URL=postgresql://${var.db_username}:${urlencode(var.db_password)}@${aws_db_instance.grand_cineplex_db.endpoint}/grand_cineplex_db" >> .env
+              echo "DATABASE_URL=postgresql://${var.db_username}:${urlencode(var.db_password)}@${aws_db_instance.grand_cineplex_db.endpoint}/grand_cineplex_db2" >> .env
               echo "S3_BUCKET=${aws_s3_bucket.media_bucket.id}" >> .env
               echo "AWS_REGION=${var.aws_region}" >> .env
               echo "JWT_SECRET=$(echo '${base64encode(var.jwt_secret)}' | base64 -d)" >> .env
@@ -253,6 +253,7 @@ resource "aws_autoscaling_attachment" "grand_cineplex_asg_attachment" {
 # --- FRONTEND BUCKET (Static Hosting) ---
 resource "aws_s3_bucket" "frontend_bucket" {
   bucket = "grand-cineplex-frontend" # REPLACE XYZ WITH UNIQUE ID
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_website_configuration" "frontend_web" {
@@ -286,6 +287,7 @@ resource "aws_s3_bucket_policy" "public_read_policy" {
 # --- MEDIA BUCKET (Application Uploads) ---
 resource "aws_s3_bucket" "media_bucket" {
   bucket = "grand-cineplex-media" # REPLACE XYZ WITH UNIQUE ID
+  force_destroy = true
 }
 
 # Allow a bucket policy for public GET on poster prefix; block ACL-based public access
