@@ -1,8 +1,8 @@
-# 🌟 Drizzle ORM Tutorial
+# Drizzle ORM Tutorial
 
 A simple guide to using Drizzle ORM in our cinema management system.
 
-## 📦 Basic Setup
+## Basic Setup
 
 1. **Database Connection**
 
@@ -34,7 +34,7 @@ const activeCustomers = await db
   .where(eq(customers.isActive, true));
 ```
 
-## 🔍 Common Operations
+## Common Operations
 
 ### 1. Select Data
 
@@ -112,7 +112,7 @@ const deletedMovies = await db
   .returning();
 ```
 
-## 🔄 Transactions
+## Transactions
 
 ```typescript
 // Using transactions
@@ -131,7 +131,7 @@ const result = await db.transaction(async (tx) => {
 });
 ```
 
-## 🎯 Best Practices
+## Best Practices
 
 1. **Always use TypeScript**
 
@@ -159,7 +159,7 @@ try {
 }
 ```
 
-## 📚 Useful Resources
+## Useful Resources
 
 - [Drizzle ORM Documentation](https://orm.drizzle.team/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)

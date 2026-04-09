@@ -1,10 +1,10 @@
-# 🗄️ Sequelize ORM Tutorial
+# Sequelize ORM Tutorial
 
 A friendly guide to using Sequelize ORM with TypeScript. This tutorial will help you understand the basics and some advanced features of Sequelize.
 
 ---
 
-## 🎯 What is Sequelize?
+## What is Sequelize?
 
 Sequelize is a **promise-based Node.js ORM** (Object-Relational Mapping) that makes it easy to work with databases using JavaScript/TypeScript. Think of it as a translator between your code and your database!
 
@@ -17,7 +17,7 @@ Sequelize is a **promise-based Node.js ORM** (Object-Relational Mapping) that ma
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Installation
 
@@ -47,7 +47,7 @@ console.log("Database connected!");
 
 ---
 
-## 📝 Creating Your First Model
+## Creating Your First Model
 
 ### Basic Model Structure
 
@@ -107,7 +107,7 @@ export default User;
 
 ---
 
-## 🔍 Basic Queries
+## Basic Queries
 
 ### Finding Records
 
@@ -173,7 +173,7 @@ await User.destroy({
 
 ---
 
-## 🔗 Associations (Relationships)
+## Associations (Relationships)
 
 ### One-to-Many Relationship
 
@@ -237,7 +237,7 @@ const userTags = await user.getTags();
 
 ---
 
-## 🎯 Custom Methods
+## Custom Methods
 
 ### Instance Methods (on individual records)
 
@@ -292,7 +292,7 @@ const john = await User.findByName("john");
 
 ---
 
-## 🔍 Advanced Queries
+## Advanced Queries
 
 ### Complex Where Clauses
 
@@ -351,7 +351,7 @@ const ageGroups = await User.findAll({
 
 ---
 
-## 🛠️ Best Practices
+## Best Practices
 
 ### 1. Use TypeScript Declarations
 
@@ -412,15 +412,15 @@ try {
 
 ---
 
-## 🎉 You're Ready!
+## You're Ready!
 
 You now know the basics of Sequelize! Here's what you can do:
 
-- ✅ Create models and define relationships
-- ✅ Perform basic CRUD operations
-- ✅ Use associations to work with related data
-- ✅ Create custom methods for business logic
-- ✅ Write complex queries with conditions and aggregations
+- Create models and define relationships
+- Perform basic CRUD operations
+- Use associations to work with related data
+- Create custom methods for business logic
+- Write complex queries with conditions and aggregations
 
 ### Next Steps:
 
@@ -430,4 +430,4 @@ You now know the basics of Sequelize! Here's what you can do:
 
 ---
 
-**Happy coding! 🚀**
+**Happy coding!**
