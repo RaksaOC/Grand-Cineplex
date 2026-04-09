@@ -12,4 +12,3 @@ output "s3_website_endpoint" {
   description = "The website endpoint for the frontend"
   value       = aws_s3_bucket_website_configuration.frontend_web.website_endpoint
 }
-
