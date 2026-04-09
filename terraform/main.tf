@@ -56,8 +56,8 @@ resource "aws_security_group" "ec2_sg" {
 
   ingress {
     description = "HTTP from internet (ALB and direct)"
-    from_port   = 80
-    to_port     = 80
+    from_port   = 3000
+    to_port     = 3000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -188,8 +188,9 @@ resource "aws_launch_template" "grand_cineplex_lt" {
               echo "JWT_SECRET=$(echo '${base64encode(var.jwt_secret)}' | base64 -d)" >> .env
               
               npm install
+              ./node_modules/.bin/tsc
               sudo npm install -g pm2
-              pm2 start server.ts
+              pm2 start dist/server.js --name cineplex-api --interpreter node
               EOF
   )
 }
@@ -222,7 +223,7 @@ resource "aws_lb" "grand_cineplex_alb" {
 
 resource "aws_lb_target_group" "grand_cineplex_tg" {
   name     = "grand-cineplex-tg"
-  port     = 80
+  port     = 3000
   protocol = "HTTP"
   vpc_id   = aws_vpc.grand_cineplex_vpc.id
 

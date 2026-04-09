@@ -69,7 +69,11 @@ export async function getMoviePosterPresignedUploadUrl(
     ContentType: contentType,
   });
 
-  const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 60 * 10 });
+  const uploadUrl = await getSignedUrl(
+    s3,
+    command,
+    { expiresIn: 60 * 10 }
+  );
 
   return {
     uploadUrl,
