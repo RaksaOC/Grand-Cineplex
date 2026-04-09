@@ -1,10 +1,10 @@
-# 🎬 Cinema Management System
+# Cinema Management System
 
 > **A comprehensive full-stack web application for cinema operations, featuring multi-role interfaces for customers, cashiers, and managers.**
 
 ---
 
-## 📋 Project Overview
+## Project Overview
 
 This Cinema Management System is a full-stack web application built as part of the Backend Development course (Year 2, Term 3). The system provides three distinct user interfaces catering to different stakeholders in a cinema environment:
 
@@ -16,7 +16,7 @@ The application handles movie management, screening schedules, real-time seat re
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Frontend
 
@@ -44,7 +44,7 @@ The application handles movie management, screening schedules, real-time seat re
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ### Frontend Structure
 
@@ -78,7 +78,7 @@ src/server/src/
 
 ---
 
-## 🗄️ Database Schema
+## Database Schema
 
 ### Core Entities
 
@@ -101,7 +101,7 @@ src/server/src/
 
 ---
 
-## 👥 Team Members & Responsibilities
+## Team Members & Responsibilities
 
 ### **Ory Chanraksa** — Project Manager & Manager Interface
 
@@ -132,7 +132,7 @@ src/server/src/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -240,7 +240,7 @@ The application will be available at:
 
 ---
 
-## ☁️ Terraform Deployment (AWS)
+## Terraform Deployment (AWS)
 
 This project includes infrastructure-as-code under `terraform/` for deploying:
 - VPC, subnets, internet gateway, route table
@@ -274,7 +274,7 @@ Detailed infrastructure documentation:
 
 ---
 
-## 📚 API Documentation
+## API Documentation
 
 ### Base URLs
 
@@ -313,7 +313,7 @@ For complete API documentation, see the individual route files in `src/server/sr
 
 ---
 
-## 🔐 User Roles & Permissions
+## User Roles & Permissions
 
 ### Customer
 
@@ -342,7 +342,7 @@ For complete API documentation, see the individual route files in `src/server/sr
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### Running Tests
 
@@ -364,7 +364,7 @@ npm test
 
 ---
 
-## 📊 Features
+## Features
 
 ### Customer Features
 
@@ -402,7 +402,7 @@ npm test
 
 ---
 
-## 🔧 Development
+## Development
 
 ### Code Style
 
@@ -459,7 +459,7 @@ cinema-management-system/
 
 ---
 
-## 🚧 Development Status
+## Development Status
 
 ### Completed Features
 
@@ -480,15 +480,15 @@ cinema-management-system/
 
 ### Planned Features
 
-- 📋 Real-time seat availability updates
-- 📋 Advanced analytics dashboard
-- 📋 Mobile-responsive design improvements
-- 📋 Multi-language support
-- 📋 Email notification system
+-  Real-time seat availability updates
+-  Advanced analytics dashboard
+-  Mobile-responsive design improvements
+-  Multi-language support
+-  Email notification system
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 This is an academic project, but contributions and suggestions are welcome:
 
@@ -500,19 +500,20 @@ This is an academic project, but contributions and suggestions are welcome:
 
 ---
 
-## 📝 License
+##  License
 
 This project is developed as part of the Backend Development course at CADT (Cambodia Academy of Digital Technology).
 
 ---
 
-## 📞 Contact
+##  Contact
 
 **Project Team:**
 
 - **Ory Chanraksa** - Manager Interface & Project Coordination
 - **Man Arafat** - Customer Interface & UX Design
 - **Sao Visal** - Cashier Interface & Backend Development
+- **Keo Hengneitong** - Monitoring & Cost Optimization
 
 **Course:** Backend Development  
 **Institution:** Cambodia Academy of Digital Technology  
