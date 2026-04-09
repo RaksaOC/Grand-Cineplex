@@ -1,10 +1,10 @@
-# 🧭 Best Practices Guide
+# Best Practices Guide
 
 A brief reference for maintaining consistency, readability, and scalability throughout the project.
 
 ---
 
-## 📁 File & Folder Structure
+## File & Folder Structure
 
 - **Follow the given structure** (e.g., `components/`, `pages/`, `services/`, etc.).
 - Group related files together by feature or function.
@@ -13,7 +13,7 @@ A brief reference for maintaining consistency, readability, and scalability thro
 
 ---
 
-## 🧩 Abstraction & Independence
+## Abstraction & Independence
 
 - **Route Registration:**
   - Register only base role prefixes (e.g., `/customer`, `/cashier`, `/manager`) in `app.ts`.
@@ -22,7 +22,7 @@ A brief reference for maintaining consistency, readability, and scalability thro
 
 ---
 
-## 🧮 Naming Conventions
+## Naming Conventions
 
 ### General
 
@@ -47,22 +47,22 @@ A brief reference for maintaining consistency, readability, and scalability thro
 
 ---
 
-## 📦 Module Imports
+## Module Imports
 
 - Use **ES6 imports** (`import` / `export`) across frontend and backend.
-  ✅ Yes: `import express from 'express'`
-  🚫 No: `const express = require('express')`
+  Yes: `import express from 'express'`
+  No: `const express = require('express')`
 
 - Avoid deep relative imports (like `../../../utils`). Use aliases or structure well.
 
 - For Sequelize models, import from the models index file if available.
 - For Drizzle schemas (legacy), import from the index file:
-  ✅ Yes: `import { movies, theaters } from '../db'`
-  🚫 No: `import { movies } from '../db/schema/movies'`
+  Yes: `import { movies, theaters } from '../db'`
+  No: `import { movies } from '../db/schema/movies'`
 
 ---
 
-## 💬 Commenting Guidelines
+## Commenting Guidelines
 
 - Use comments sparingly but clearly:
 
@@ -80,7 +80,7 @@ Example:
 
 ---
 
-## 🌐 API Layer (Frontend)
+## API Layer (Frontend)
 
 - Centralize API calls (e.g., in `api/[api].ts`) to avoid scattered logic.
 - **Prefer utility functions** for each endpoint (not classes), e.g.:
@@ -95,7 +95,7 @@ Example:
 
 ---
 
-## 🎨 Components
+## Components
 
 - Use `components/common/` for shared elements like `Button`, `Modal`, `Input`.
 - Use subfolders in `components/` to group page-specific components.
@@ -103,7 +103,7 @@ Example:
 
 ---
 
-## 📄 Database (Sequelize & Drizzle)
+## Database (Sequelize & Drizzle)
 
 - **Sequelize (current):**
 
@@ -132,7 +132,7 @@ Example:
 
 ---
 
-## 🧪 Testing & Debugging
+## Testing & Debugging
 
 - Write minimal unit tests where critical (if applicable).
 - Use clear console logs (remove before production).
@@ -143,9 +143,9 @@ console.log("[User Fetch]", userData); // DEBUG:
 
 ---
 
-## 🧪 Git & Version Control
+## Git & Version Control
 
-## 📄 Other Notes
+## Other Notes
 
 - Always keep `.env` for secrets — never commit `.env` or `node_modules`.
 - Prefer `.tsx` for React files and `.ts` for logic/backend.

@@ -1,6 +1,6 @@
-## 🗃️ Git & Version Control
+## Git & Version Control
 
-### 📌 Git Workflow & Team Collaboration
+### Git Workflow & Team Collaboration
 
 * **Create branches** for each feature, bugfix, or experiment:
 
@@ -10,9 +10,9 @@
 
 * **Write meaningful commit messages**:
 
-  * ✅ `feat: add responsive navbar`
-  * ✅ `fix: correct typo in API endpoint`
-  * 🚫 `update code` or `fixed stuff`
+   * Good: `feat: add responsive navbar`
+   * Good: `fix: correct typo in API endpoint`
+   * Avoid: `update code` or `fixed stuff`
 
 * **Commit often**, after logical chunks of work. Don’t wait until the end.
 
@@ -60,7 +60,7 @@ Collaborating on code requires clean merging to avoid conflicts and preserve his
 
 ---
 
-### ✅ Summary
+### Summary
 
 1. Merge your target branch **into your feature branch locally** (`git merge main`)
 2. Resolve any conflicts locally
@@ -72,7 +72,7 @@ Collaborating on code requires clean merging to avoid conflicts and preserve his
 
 
 
-### 🧠 Useful Git Commands
+### Useful Git Commands
 
 | Command                           | What It Does                                                 |
 | --------------------------------- | ------------------------------------------------------------ |
@@ -91,7 +91,7 @@ Collaborating on code requires clean merging to avoid conflicts and preserve his
 
 ---
 
-### ✅ Recommended Git Workflow
+### Recommended Git Workflow
 
 ```bash
 # Start by fetching latest remote branches

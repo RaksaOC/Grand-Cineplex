@@ -4,6 +4,7 @@
     "module": "esnext",
     "lib": ["dom", "esnext"],
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
